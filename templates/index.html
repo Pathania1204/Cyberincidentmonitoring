@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-Incident Feed Monitoring System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#3B82F6', // blue-500
+                            dark: '#60A5FA'    // blue-400
+                        },
+                        secondary: {
+                            light: '#EF4444', // red-500
+                            dark: '#F87171'   // red-400
+                        },
+                        background: {
+                            light: '#F3F4F6', // gray-100
+                            dark: '#1F2937'   // gray-800
+                        },
+                        card: {
+                            light: '#FFFFFF', // white
+                            dark: '#374151'   // gray-700
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles */
+        .theme-transition {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 5px 10px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        input, select {
+            background-color: transparent;
+        }
+
+        /* Improve chart responsiveness */
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        /* Custom loader */
+        .loader {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3B82F6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        .dark .loader {
+            border-color: rgba(255, 255, 255, 0.1);
+            border-left-color: #60A5FA;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.375rem;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 min-h-screen theme-transition">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header Section with Gradient Background -->
+        <div class="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mb-12 shadow-xl">
+            <div class="absolute inset-0 bg-black opacity-10"></div>
+            <div class="relative z-10 text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight animate-fade-in-down">
+                    Cyber-Incident Feed <span class="text-yellow-300">Monitoring System</span>
+                </h1>
+                <p class="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed animate-fade-in-up">
+                    Advanced real-time threat detection and analysis powered by machine learning
+                </p>
+            </div>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-fade-in">
+            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div class="text-primary-light dark:text-primary-dark mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Real-time Analysis</h3>
+                <p class="text-gray-600 dark:text-gray-300">Instant assessment of network traffic patterns and anomaly detection</p>
+            </div>
+            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div class="text-secondary-light dark:text-secondary-dark mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Severity Classification</h3>
+                <p class="text-gray-600 dark:text-gray-300">Accurate categorization of threats from low to critical levels</p>
+            </div>
+            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div class="text-green-500 dark:text-green-400 mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Attack Type Detection</h3>
+                <p class="text-gray-600 dark:text-gray-300">Identification of various cyber attack patterns and categories</p>
+            </div>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-primary-light dark:text-primary-dark">Cyber-Incident Feed Monitoring System</h1>
+            <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-primary-dark">
+                <!-- Sun icon for dark mode -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <!-- Moon icon for light mode -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column -->
+            <div class="space-y-8">
+                <!-- Input Form -->
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg theme-transition">
+                    <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Input Parameters</h2>
+                    <form id="predictionForm" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 tooltip">
+                                Source Port
+                                <span class="tooltip-text">The origin port number of the network traffic</span>
+                            </label>
+                            <input type="number" name="source_port" placeholder="e.g., 443" required
+                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-light dark:focus:border-primary-dark focus:ring focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 tooltip">
+                                Destination Port
+                                <span class="tooltip-text">The target port number where the traffic is directed</span>
+                            </label>
+                            <input type="number" name="destination_port" placeholder="e.g., 80" required
+                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-light dark:focus:border-primary-dark focus:ring focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 tooltip">
+                                Protocol
+                                <span class="tooltip-text">The network protocol used for the traffic</span>
+                            </label>
+                            <select name="protocol" required
+                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-light dark:focus:border-primary-dark focus:ring focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 dark:bg-gray-800">
+                                <option value="TCP">TCP</option>
+                                <option value="UDP">UDP</option>
+                                <option value="ICMP">ICMP</option>
+                                <option value="HTTP">HTTP</option>
+                                <option value="HTTPS">HTTPS</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 tooltip">
+                                Packet Length
+                                <span class="tooltip-text">Size of the network packet in bytes</span>
+                            </label>
+                            <input type="number" name="packet_length" placeholder="e.g., 1024" required
+                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-light dark:focus:border-primary-dark focus:ring focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 tooltip">
+                                Anomaly Scores
+                                <span class="tooltip-text">Measure of how unusual the traffic pattern is (0-1)</span>
+                            </label>
+                            <input type="number" name="anomaly_scores" step="0.01" placeholder="e.g., 0.75" required
+                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-light dark:focus:border-primary-dark focus:ring focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 dark:bg-gray-800">
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-primary-light dark:bg-primary-dark text-white py-3 px-4 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark focus:ring-offset-2 transition-colors">
+                            Analyze Traffic
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Prediction Results -->
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg theme-transition hover-scale">
+                    <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Analysis Results</h2>
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Our advanced AI model analyzes the provided network traffic parameters to determine potential security threats and their severity levels. The confidence scores indicate the reliability of these predictions.</p>
+                    </div>
+                    <div id="predictionResult" class="hidden space-y-6 fade-in">
+                        <!-- Severity Level Result -->
+                        <div class="border-b border-gray-200 dark:border-gray-600 pb-4">
+                            <div class="flex items-center mb-2">
+                                <p class="text-lg font-medium">Severity Level:</p>
+                                <div class="tooltip ml-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="tooltip-text">Indicates the potential impact and urgency of the detected threat</span>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline my-2">
+                                <p id="severityLevel" class="text-3xl font-bold text-primary-light dark:text-primary-dark mr-2"></p>
+                                <div class="badge bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span id="severityConfidence"></span>% confidence
+                                </div>
+                            </div>
+                            <div id="severityIndicator" class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden mt-2">
+                                <div class="h-full bg-primary-light dark:bg-primary-dark" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <!-- Attack Type Result -->
+                        <div>
+                            <div class="flex items-center mb-2">
+                                <p class="text-lg font-medium">Attack Type:</p>
+                                <div class="tooltip ml-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="tooltip-text">Classification of the detected cyber attack pattern</span>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline my-2">
+                                <p id="attackType" class="text-3xl font-bold text-secondary-light dark:text-secondary-dark mr-2"></p>
+                                <div class="badge bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                                    <span id="attackConfidence"></span>% confidence
+                                </div>
+                            </div>
+                            <div id="attackIndicator" class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden mt-2">
+                                <div class="h-full bg-secondary-light dark:bg-secondary-dark" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="loadingIndicator" class="hidden py-8">
+                        <div class="loader"></div>
+                        <p class="text-center mt-4">Analyzing traffic patterns...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Charts -->
+            <div class="space-y-8">
+                <!-- Severity Distribution Chart -->
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg theme-transition hover-scale">
+                    <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Severity Distribution</h2>
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">This chart shows the distribution of incident severity levels across your network traffic. Understanding this distribution helps identify the overall security posture and areas requiring immediate attention.</p>
+                    </div>
+                    <div class="chart-container fade-in">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Attack Type Distribution Chart -->
+                <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl shadow-lg theme-transition hover-scale">
+                    <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Attack Type Distribution</h2>
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">This visualization represents the frequency of different types of cyber attacks detected in the network. It helps identify the most common attack patterns and prioritize security measures accordingly.</p>
+                    </div>
+                    <div class="chart-container fade-in">
+                        <canvas id="attackChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode toggle functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleBtn = document.getElementById('themeToggle');
+            const htmlElement = document.documentElement;
+            
+            // Check for saved theme preference or use system preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || 
+                (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                htmlElement.classList.add('dark');
+            } else {
+                htmlElement.classList.remove('dark');
+            }
+            
+            // Toggle theme on button click
+            themeToggleBtn.addEventListener('click', () => {
+                htmlElement.classList.toggle('dark');
+                localStorage.setItem('theme', 
+                    htmlElement.classList.contains('dark') ? 'dark' : 'light');
+                updateCharts();
+            });
+        });
+
+        let severityChart = null;
+        let attackChart = null;
+        let chartData = null;
+
+        // Function to get chart colors based on current theme
+        function getChartColors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            return {
+                severity: {
+                    backgroundColor: [
+                        isDark ? 'rgba(74, 222, 128, 0.5)' : 'rgba(72, 187, 120, 0.5)',  // Green
+                        isDark ? 'rgba(250, 204, 21, 0.5)' : 'rgba(246, 173, 85, 0.5)',  // Yellow/Orange
+                        isDark ? 'rgba(249, 115, 22, 0.5)' : 'rgba(237, 137, 54, 0.5)',  // Orange
+                        isDark ? 'rgba(248, 113, 113, 0.5)' : 'rgba(245, 101, 101, 0.5)'  // Red
+                    ],
+                    borderColor: [
+                        isDark ? 'rgb(74, 222, 128)' : 'rgb(72, 187, 120)',
+                        isDark ? 'rgb(250, 204, 21)' : 'rgb(246, 173, 85)',
+                        isDark ? 'rgb(249, 115, 22)' : 'rgb(237, 137, 54)',
+                        isDark ? 'rgb(248, 113, 113)' : 'rgb(245, 101, 101)'
+                    ]
+                },
+                attack: {
+                    backgroundColor: isDark ? 'rgba(129, 140, 248, 0.5)' : 'rgba(79, 70, 229, 0.5)',
+                    borderColor: isDark ? 'rgb(129, 140, 248)' : 'rgb(79, 70, 229)'
+                },
+                grid: {
+                    color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                },
+                text: isDark ? '#e5e7eb' : '#374151'
+            };
+        }
+
+        // Update charts when theme changes
+        function updateCharts() {
+            if (!severityChart || !attackChart || !chartData) return;
+            
+            const colors = getChartColors();
+            
+            // Update severity chart colors
+            severityChart.data.datasets[0].backgroundColor = colors.severity.backgroundColor;
+            severityChart.data.datasets[0].borderColor = colors.severity.borderColor;
+            
+            // Update attack chart colors
+            attackChart.data.datasets[0].backgroundColor = colors.attack.backgroundColor;
+            attackChart.data.datasets[0].borderColor = colors.attack.borderColor;
+            
+            // Update grid and text colors for both charts
+            [severityChart, attackChart].forEach(chart => {
+                chart.options.scales.x.grid.color = colors.grid.color;
+                chart.options.scales.y.grid.color = colors.grid.color;
+                chart.options.scales.x.ticks.color = colors.text;
+                chart.options.scales.y.ticks.color = colors.text;
+                chart.options.plugins.legend.labels.color = colors.text;
+                chart.update();
+            });
+        }
+
+        // Initialize charts with responsive and theme-aware design
+        async function initializeCharts() {
+            try {
+                const response = await fetch('/train', { method: 'POST' });
+                chartData = await response.json();
+                
+                const colors = getChartColors();
+                const chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: colors.text,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: colors.grid.color
+                            },
+                            ticks: {
+                                color: colors.text
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: colors.grid.color
+                            },
+                            ticks: {
+                                color: colors.text
+                            }
+                        }
+                    }
+                };
+                
+                // Initialize Severity Distribution Chart
+                const severityCtx = document.getElementById('severityChart').getContext('2d');
+                severityChart = new Chart(severityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Low', 'Medium', 'High', 'Critical'],
+                        datasets: [{
+                            label: 'Severity Distribution',
+                            data: chartData.severity_distribution,
+                            backgroundColor: colors.severity.backgroundColor,
+                            borderColor: colors.severity.borderColor,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: chartOptions
+                });
+
+                // Initialize Attack Type Distribution Chart with rotated labels
+                const attackCtx = document.getElementById('attackChart').getContext('2d');
+                attackChart = new Chart(attackCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.attack_labels,
+                        datasets: [{
+                            label: 'Attack Type Distribution',
+                            data: chartData.attack_distribution,
+                            backgroundColor: colors.attack.backgroundColor,
+                            borderColor: colors.attack.borderColor,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        ...chartOptions,
+                        scales: {
+                            ...chartOptions.scales,
+                            x: {
+                                ...chartOptions.scales.x,
+                                ticks: {
+                                    ...chartOptions.scales.x.ticks,
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing charts:', error);
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Show loading indicator
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.getElementById('predictionResult').classList.add('hidden');
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Update UI with predictions
+                    document.getElementById('severityLevel').textContent = result.severity_level;
+                    const severityConfidence = (result.severity_confidence * 100).toFixed(2);
+                    document.getElementById('severityConfidence').textContent = severityConfidence;
+                    document.getElementById('severityIndicator').querySelector('div').style.width = `${severityConfidence}%`;
+                    
+                    document.getElementById('attackType').textContent = result.attack_type;
+                    const attackConfidence = (result.attack_confidence * 100).toFixed(2);
+                    document.getElementById('attackConfidence').textContent = attackConfidence;
+                    document.getElementById('attackIndicator').querySelector('div').style.width = `${attackConfidence}%`;
+                    
+                    document.getElementById('predictionResult').classList.remove('hidden');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while analyzing the traffic.');
+            } finally {
+                document.getElementById('loadingIndicator').classList.add('hidden');
+            }
+        });
+
+        // Initialize the charts when the page loads
+        window.addEventListener('load', initializeCharts);
+    </script>
+</body>
+</html>
