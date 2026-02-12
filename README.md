@@ -1,96 +1,60 @@
-# Cyber-Incident Feed Monitoring System
+**🛡️ Cyber-Incident Feed Monitoring System**
 
-A web-based application that uses machine learning to predict cyber-incident severity levels based on network traffic parameters. The system uses an XGBoost model trained on cyber security incident data to make predictions.
+A Machine Learning–powered web application that predicts cyber-incident severity levels and attack types based on real-time network traffic parameters.
+Built using Flask + XGBoost + Chart.js, this system analyzes traffic inputs and provides severity predictions with confidence scores and visual insights.
 
-## Features
+**🔥 Key Highlights**
+🚨 Real-time cyber incident severity prediction
+🧠 XGBoost model trained on cybersecurity dataset
+📊 Interactive attack & severity distribution visualizations
+🌐 RESTful API for model predictions
+📱 Fully responsive UI using Tailwind CSS
 
-- Real-time prediction of incident severity levels
-- Interactive web interface with form inputs
-- Visualization of severity distribution using Chart.js
-- Responsive design using Tailwind CSS
-- RESTful API endpoints for predictions
+**🧠 How It Works**
+1.User inputs network traffic parameters:
+Source Port
+Destination Port
+Protocol
+Packet Length
+Anomaly Score
 
-## Prerequisites
+2.Data is preprocessed using scikit-learn.
 
-- Python 3.8 or higher
-- pip (Python package manager)
-- Modern web browser
+3.The trained XGBoost model predicts:
+Severity Level (Low / Medium / High / Critical)
+Attack Type (DDoS / Intrusion / Malware)
 
-## Installation
+4.Results are displayed with:
+Confidence scores
+Severity bars
+Chart-based distribution visualization
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd cyber-incident-feed-monitoring
-```
+**🛠 Tech Stack**
+🔹 Backend
+Python
+Flask
+XGBoost
+Pandas
+scikit-learn
+Joblib
 
-2. Create a virtual environment (recommended):
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+🔹 Frontend
+HTML5
+Tailwind CSS
+JavaScript (Fetch API)
 
-3. Install the required packages:
-```bash
-pip install -r requirements.txt
-```
-
-## Usage
-
-1. Start the Flask application:
-```bash
-python app.py
-```
-
-2. Open your web browser and navigate to:
-```
-http://localhost:5000
-```
-
-3. Use the form to input incident parameters:
-   - Source Port
-   - Destination Port
-   - Protocol
-   - Packet Length
-   - Anomaly Scores
-
-4. Click "Predict Severity" to get the prediction result
-
-## Project Structure
-
-```
-cyber-incident-feed-monitoring/
-├── app.py                 # Flask application and ML model
-├── requirements.txt       # Python dependencies
-├── ML_Dataset.csv        # Training dataset
+**📁 Project Structure**
+cyber-incident-feed-monitoring
+├── app.py
+├── requirements.txt
+├── ML_Dataset.csv
+├── model.joblib
 ├── templates/
-│   └── index.html        # Web interface
-└── model.joblib          # Trained model (generated on first run)
-```
+│   └── index.html
 
-## API Endpoints
+🚀 Future Improvements
 
-- `GET /` - Web interface
-- `POST /predict` - Make predictions
-- `POST /train` - Train model and get severity distribution
-
-## Technologies Used
-
-- Backend:
-  - Flask (Python web framework)
-  - XGBoost (Machine Learning)
-  - Pandas (Data processing)
-  - scikit-learn (Data preprocessing)
-
-- Frontend:
-  - HTML5
-  - Tailwind CSS (via CDN)
-  - Chart.js (via CDN)
-  - Fetch API (AJAX requests)
-
-## Notes
-
-- The model is automatically trained on first run
-- Predictions are made in real-time
-- The system uses a pre-trained model stored in `model.joblib`
-- The web interface is responsive and works on both desktop and mobile devices 
+Add authentication & admin dashboard
+Deploy using Docker + Cloud (AWS / Render)
+Add real-time streaming data support
+Improve model with feature engineering
