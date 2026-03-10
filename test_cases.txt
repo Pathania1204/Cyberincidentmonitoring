@@ -1,0 +1,145 @@
+# Cyber Incident Monitoring System - Test Cases
+
+## High Severity Attack Patterns
+
+### Test Case 1: SSH Brute Force Attack
+Source Port: 54321
+Destination Port: 22
+Protocol: TCP
+Packet Length: 64
+Anomaly Score: 0.85
+Expected Result: High or Critical severity, "SSH Brute Force" attack type
+
+### Test Case 2: Normal Web Traffic
+Source Port: 49152
+Destination Port: 443
+Protocol: TCP
+Packet Length: 1024
+Anomaly Score: 0.15
+Expected Result: Low severity, likely "Normal Traffic" attack type
+
+### Test Case 3: DNS Amplification Attack
+Source Port: 12345
+Destination Port: 53
+Protocol: UDP
+Packet Length: 512
+Anomaly Score: 0.90
+Expected Result: Critical severity, "DNS Amplification" attack type
+
+### Test Case 4: ICMP Flood
+Source Port: 0
+Destination Port: 0
+Protocol: ICMP
+Packet Length: 1500
+Anomaly Score: 0.80
+Expected Result: High severity, "ICMP Flood" attack type
+
+### Test Case 5: SQL Injection Attack
+Source Port: 49321
+Destination Port: 1433
+Protocol: TCP
+Packet Length: 256
+Anomaly Score: 0.88
+Expected Result: High severity, "SQL Injection" attack type
+
+### Test Case 6: RDP Brute Force
+Source Port: 54123
+Destination Port: 3389
+Protocol: TCP
+Packet Length: 128
+Anomaly Score: 0.75
+Expected Result: High severity, "RDP Brute Force" attack type
+
+### Test Case 7: SMB Exploitation
+Source Port: 54999
+Destination Port: 445
+Protocol: TCP
+Packet Length: 512
+Anomaly Score: 0.92
+Expected Result: High severity, "SMB Exploitation" attack type
+
+### Test Case 8: DDoS HTTP Flood
+Source Port: 56789
+Destination Port: 80
+Protocol: TCP
+Packet Length: 2048
+Anomaly Score: 0.95
+Expected Result: Critical severity, "DDoS Attack" attack type
+
+## Medium Severity Patterns
+
+### Test Case 9: Unusual Port Access
+Source Port: 33333
+Destination Port: 8080
+Protocol: TCP
+Packet Length: 768
+Anomaly Score: 0.45
+Expected Result: Medium severity, possibly "Suspicious Connection" attack type
+
+### Test Case 10: Port Scanning (Light)
+Source Port: 54321
+Destination Port: 21
+Protocol: TCP
+Packet Length: 64
+Anomaly Score: 0.50
+Expected Result: Medium severity, possibly "Port Scanning" attack type
+
+## Low Severity/Normal Traffic
+
+### Test Case 11: Standard DNS Request
+Source Port: 54321
+Destination Port: 53
+Protocol: UDP
+Packet Length: 64
+Anomaly Score: 0.05
+Expected Result: Low severity, likely "Normal Traffic" attack type
+
+### Test Case 12: Regular Web API Call
+Source Port: 51234
+Destination Port: 8443
+Protocol: TCP
+Packet Length: 1024
+Anomaly Score: 0.12
+Expected Result: Low severity, likely "Normal Traffic" attack type
+
+### Test Case 13: Normal Email Traffic
+Source Port: 49876
+Destination Port: 25
+Protocol: TCP
+Packet Length: 4096
+Anomaly Score: 0.10
+Expected Result: Low severity, likely "Normal Traffic" attack type
+
+## Edge Cases
+
+### Test Case 14: High Anomaly Score but Normal Ports
+Source Port: 49152
+Destination Port: 80
+Protocol: TCP
+Packet Length: 1024
+Anomaly Score: 0.75
+Expected Result: Medium or High severity (model decision with rule override)
+
+### Test Case 15: Low Anomaly Score but Suspicious Port Combination
+Source Port: 31337
+Destination Port: 1434
+Protocol: UDP
+Packet Length: 512
+Anomaly Score: 0.20
+Expected Result: Medium severity (model decision with rule override)
+
+### Test Case 16: Very Large Packet
+Source Port: 49152
+Destination Port: 80
+Protocol: TCP
+Packet Length: 65000
+Anomaly Score: 0.40
+Expected Result: Medium severity (large packets can be suspicious)
+
+### Test Case 17: Mixed Signals
+Source Port: 1024
+Destination Port: 53
+Protocol: TCP
+Packet Length: 8192
+Anomaly Score: 0.60
+Expected Result: Medium or High severity (unusual TCP to DNS with large packet) 
